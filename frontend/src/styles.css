@@ -38,6 +38,10 @@ body {
   min-height: 100vh;
 }
 
+.shell--fallback {
+  min-height: 100vh;
+}
+
 .sidebar {
   padding: 28px 20px;
   border-right: 1px solid var(--line);
@@ -209,6 +213,10 @@ body {
     radial-gradient(circle at center, rgba(44, 197, 155, 0.18), transparent 45%),
     rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
+}
+
+.content p {
+  line-height: 1.6;
 }
 
 .text-area,

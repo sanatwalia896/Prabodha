@@ -26,25 +26,52 @@ export function createApp(mountNode) {
   const store = createStore();
   const router = createRouter(routes);
 
-  async function renderRoute() {
+  function renderRoute() {
     const route = normalizeRoute(window.location.hash.replace(/^#/, "") || "/");
     const pageRenderer = router.resolve(route.path);
-    const dashboardData = await fetchDashboardData();
-    const sessionData = await fetchSessionData(route);
-
-    mountNode.innerHTML = "";
-    mountNode.appendChild(
-      renderLayout({
-        route,
-        store: store.getState(),
-        content: pageRenderer({
+    const renderFrame = (dashboardData, sessionData) => {
+      mountNode.innerHTML = "";
+      mountNode.appendChild(
+        renderLayout({
           route,
-          store,
-          dashboardData,
-          sessionData,
+          store: store.getState(),
+          content: pageRenderer({
+            route,
+            store,
+            dashboardData,
+            sessionData,
+          }),
         }),
-      }),
-    );
+      );
+    };
+
+    const fallbackDashboard = {
+      quote: "Attention is a skill. Train it like one.",
+      metrics: [
+        { label: "Avg Focus", value: "84%" },
+        { label: "Hours Tracked", value: "4.3" },
+        { label: "Top Distraction", value: "Slack" },
+      ],
+    };
+    const fallbackSession = {
+      route,
+      timer: "01:42:18",
+      score: 87,
+      events: [
+        "Focused -> Possible Distraction at T+42m",
+        "Recovered at T+47m",
+      ],
+    };
+
+    renderFrame(fallbackDashboard, fallbackSession);
+
+    Promise.all([fetchDashboardData(), fetchSessionData(route)])
+      .then(([dashboardData, sessionData]) => {
+        renderFrame(dashboardData, sessionData);
+      })
+      .catch(() => {
+        renderFrame(fallbackDashboard, fallbackSession);
+      });
   }
 
   window.addEventListener("hashchange", renderRoute);

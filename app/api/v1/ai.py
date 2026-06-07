@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from app.api.deps import db_session
+from app.core.config import get_settings
 from app.schemas.ai import AIInsightOut, ChatMessageIn, ChatMessageOut, ReflectionResponse
 from app.services.ai_service import AIService
 
@@ -11,7 +12,7 @@ router = APIRouter()
 
 @router.get("/reflect/{session_id}", response_model=AIInsightOut)
 def reflect_session(session_id: UUID, db=Depends(db_session)) -> AIInsightOut:
-    insight = AIService(db).reflect_session(session_id)
+    insight = AIService(db, settings=get_settings()).reflect_session(session_id)
     return AIInsightOut(
         insight_id=insight.insight_id,
         session_id=insight.session_id,

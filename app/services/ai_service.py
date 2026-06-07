@@ -4,20 +4,23 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import Settings
 from app.db.models.ai_insight import AIInsight
 from app.db.models.app_activity import AppActivity
 from app.db.models.focus_score import FocusScore
 from app.db.models.journal import Journal
 from app.db.models.session import Session as SessionModel
-from gemma_service.application.client import DummyLLMClient
+from gemma_service.application.client import DummyLLMClient, OllamaClient
 from gemma_service.application.gemma_service import GemmaReflectionService
 from gemma_service.domain.models import SessionSnapshot
 
 
 class AIService:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: Session, settings: Settings | None = None, gemma_client=None) -> None:
         self.db = db
-        self.gemma = GemmaReflectionService(client=DummyLLMClient())
+        if gemma_client is None and settings is not None:
+            gemma_client = OllamaClient(settings.ai_engine_url)
+        self.gemma = GemmaReflectionService(client=gemma_client or DummyLLMClient())
 
     def reflect_session(self, session_id: UUID) -> AIInsight:
         snapshot = self._build_snapshot(str(session_id))

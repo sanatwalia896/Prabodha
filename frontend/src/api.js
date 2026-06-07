@@ -7,6 +7,8 @@ const fallbackDashboard = {
   ],
 };
 
+const API_BASE_URL = window.__PRABODHA_API_BASE__ || "http://localhost:8000";
+
 export async function fetchDashboardData() {
   const response = await tryFetch("/api/v1/analytics/trends?user_id=00000000-0000-0000-0000-000000000001");
   if (!response) {
@@ -51,7 +53,7 @@ export async function fetchSessionData(route) {
 
 async function tryFetch(pathname) {
   try {
-    const response = await fetch(pathname, { headers: { Accept: "application/json" } });
+    const response = await fetch(`${API_BASE_URL}${pathname}`, { headers: { Accept: "application/json" } });
     if (!response.ok) {
       return null;
     }

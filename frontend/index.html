@@ -4,10 +4,111 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prabodha</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #07111f;
+        color: #eef4ff;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        min-height: 100vh;
+      }
+      #app {
+        min-height: 100vh;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 100vh;
+      }
+      .sidebar,
+      .card,
+      .hero {
+        background: rgba(13, 23, 40, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .sidebar {
+        padding: 28px 20px;
+      }
+      .workspace {
+        padding: 24px;
+      }
+      .card,
+      .hero {
+        border-radius: 20px;
+        padding: 20px;
+      }
+      .brand__mark {
+        display: inline-block;
+        width: 14px;
+        height: 42px;
+        border-radius: 999px;
+        background: #2cc59b;
+        margin-right: 12px;
+        vertical-align: middle;
+      }
+      .eyebrow,
+      .brand p {
+        color: #97a6bf;
+      }
+      h2, strong {
+        margin: 0;
+      }
+    </style>
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="./src/main.js"></script>
+    <div id="app">
+      <div class="shell shell--fallback">
+        <aside class="sidebar">
+          <div class="brand">
+            <span class="brand__mark"></span>
+            <div>
+              <strong>Prabodha</strong>
+              <p>Loading productivity command center...</p>
+            </div>
+          </div>
+        </aside>
+        <div class="workspace">
+          <main class="content">
+            <section class="page">
+              <article class="card stack">
+                <span class="eyebrow">Starting up</span>
+                <h2>Preparing your dashboard</h2>
+                <p>If this screen stays here, open the browser console for the exact error.</p>
+              </article>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+    <script>
+      window.__PRABODHA_BOOT__ = true;
+      const mountNode = document.querySelector("#app");
+      const showBootError = (error) => {
+        if (!mountNode) return;
+        mountNode.innerHTML = `
+          <div class="shell shell--fallback">
+            <main class="workspace">
+              <div class="content">
+                <section class="page">
+                  <article class="card stack">
+                    <span class="eyebrow">Frontend error</span>
+                    <h2>Failed to load the app</h2>
+                    <p>${error && error.message ? error.message : String(error)}</p>
+                  </article>
+                </section>
+              </div>
+            </main>
+          </div>
+        `;
+      };
+      window.addEventListener("error", (event) => showBootError(event.error || event.message));
+      window.addEventListener("unhandledrejection", (event) => showBootError(event.reason));
+      import("./src/main.js").catch(showBootError);
+    </script>
   </body>
   </html>

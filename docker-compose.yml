@@ -12,68 +12,11 @@ services:
     networks:
       - focus-network
 
-  focus-cache:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    networks:
-      - focus-network
-
-  focus-backend:
-    build:
-      context: .
-      dockerfile: docker/backend.Dockerfile
-    environment:
-      APP_ENV: production
-      DATABASE_URL: postgresql+psycopg2://focus:focus@focus-db:5432/focus_db
-      REDIS_URL: redis://focus-cache:6379/0
-      AI_ENGINE_URL: http://focus-ai:11434
-      MEDIA_ROOT: /app/data/media
-    ports:
-      - "8000:8000"
+  focus-media:
+    image: alpine:3.20
+    command: ["sh", "-c", "mkdir -p /data/media && tail -f /dev/null"]
     volumes:
-      - ./data/media:/app/data/media
-    depends_on:
-      - focus-db
-      - focus-cache
-    networks:
-      - focus-network
-
-  focus-ui:
-    build:
-      context: .
-      dockerfile: docker/frontend.Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - focus-backend
-    networks:
-      - focus-network
-
-  focus-ai:
-    image: ollama/ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ./data/ollama:/root/.ollama
-    networks:
-      - focus-network
-
-  focus-cv:
-    build:
-      context: .
-      dockerfile: docker/cv.Dockerfile
-    environment:
-      CAMERA_DEVICE: /dev/video0
-      FRAME_WIDTH: 640
-      FRAME_HEIGHT: 480
-      BACKEND_URL: http://focus-backend:8000
-    volumes:
-      - ./data/media:/app/data/media
-    devices:
-      - /dev/video0:/dev/video0
-    depends_on:
-      - focus-backend
+      - ./data/media:/data/media
     networks:
       - focus-network
 
